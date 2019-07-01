@@ -3,9 +3,10 @@
 function onOpen(){
   SpreadsheetApp.getUi()
   .createMenu('💸')
-  .addItem('Payroll', 'payroll')
-  .addItem('Delete All 3 Letter Tabs','delete3LetterTabs')
-  .addItem('Mulligan 1 Employee', 'mulligan')
+  .addItem('Run Payroll', 'payroll')
+  .addSeparator()
+  .addItem('Delete All','delete3LetterTabs')
+  .addItem('Mulligan', 'mulligan')
   .addSeparator()
   .addItem('Send Emails', 'sendOutEmails')
   .addToUi();
@@ -21,7 +22,9 @@ var jobs      = getSheetObj('Jobs');          // Jobs comes in every week - repl
 var mileage   = getSheetObj('Mileage');       // Mileage is from the forms Employees submit daily - Query of the results page is imported locally to show only the miles needed
 var timecards = getSheetObj('Timecard');      // Timecards is the 2nd sheet along with jobs that has to be manually imported by hand from HCP
 var rates     = getSheetObj('Rates');         // Rates is another local sheet on Nates Payroll that is imported from Rates SpreadSheet which updates when Min wage goes up every July 1st.. ugh
-                                            
+var template = activeSS.getSheetByName('Template').activate();                                  
+
+
 function tabList(){
   var tabs = [];
   employees.forEach(function(employee){
@@ -32,14 +35,19 @@ function tabList(){
   return tabs;
 }
 
-function redoTab(tabname){
 
 
 
-}
+
+
+
+
 
 function newTab(name) {
-  return SpreadsheetApp.getActiveSpreadsheet().insertSheet(name).setActiveSelection('D6');
+  var temp = template;
+  var ss = activeSS;
+  return temp.copyTo(ss).setName(name).setActiveSelection('D6');
+  //return SpreadsheetApp.getActiveSpreadsheet().insertSheet(name).setActiveSelection('D6');
 }
 
 var mulligan = function(){
@@ -47,7 +55,7 @@ var mulligan = function(){
   
   //var list = threeLetterSheets(ssSheets);
   
-  var tabhtml = '<select id="selection" name="Employees"><option value="Pickem" disabled>Pickem</option>'
+  var tabhtml = '<select id="selection" name="Employees"><option value="Pickem" disabled selected>Pickem</option>'
 //var tabhtml = '<ul>'
   ssSheets.forEach(function(x){
     Logger.log(x.getName());
@@ -64,8 +72,9 @@ var mulligan = function(){
   //return html.evaluate();
   
   SpreadsheetApp.getUi().showSidebar(html.evaluate().setWidth(200));
-
 }
+
+// Returns an array of objects with 2 properties the name of the 3 letter sheet and the sheet itself
 var threeLetterSheets = function(daSheets){
   var threeLettSheets = [];
   
@@ -83,6 +92,7 @@ var threeLetterSheets = function(daSheets){
 
 function deleteCreateSingleTab(name){
   Logger.log(name);
+  var result = [];
   ssSheets.forEach(function(obj){
      // if the button has passed a 3 letter name
    
@@ -95,10 +105,11 @@ function deleteCreateSingleTab(name){
        })
        employees = newEmployees;
        payroll();
+       result.push({ 'name' : name, 'arrayOfEmps' : newEmployees});
      }
   });
-     
-  Logger.log({ 'name' : name, 'firstName' : employees[0]});
+  Logger.log(result);   
+  return name;
 }
 
 
