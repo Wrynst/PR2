@@ -42,7 +42,7 @@ function tabList(){
 
 
 
-
+// copies the template to print the payroll to and renames it
 function newTab(name) {
   var temp = template;
   var ss = activeSS;
@@ -50,27 +50,23 @@ function newTab(name) {
   //return SpreadsheetApp.getActiveSpreadsheet().insertSheet(name).setActiveSelection('D6');
 }
 
+// Makes the dropdown list for Mulligan
 var mulligan = function(){
   var html = HtmlService.createTemplateFromFile('mulligan');
   
-  //var list = threeLetterSheets(ssSheets);
-  
   var tabhtml = '<select id="selection" name="Employees"><option value="Pickem" disabled selected>Pickem</option>'
-//var tabhtml = '<ul>'
+
   ssSheets.forEach(function(x){
-    Logger.log(x.getName());
+    
     if(x.getName().length == 3){
-     tabhtml += '<option value="' + x.getName() + '">' + x.getName() + '</option>'
-      //tabhtml += '<li>' + x.getName() + ' : ' + x.getName() + '</li>'
+      tabhtml += '<option value="' + x.getName() + '">' + x.getName() + '</option>'
     }
   });
-  //tabhtml += '</ul>'
+ 
   tabhtml += '</select>';
   html.tabs = tabhtml;
   
- //Logger.log(html.evaluate().getContent());
-  //return html.evaluate();
-  
+  // Make the SideBar
   SpreadsheetApp.getUi().showSidebar(html.evaluate().setWidth(200));
 }
 
@@ -113,7 +109,7 @@ function deleteCreateSingleTab(name){
 }
 
 
-function delete3LetterTabs(){                                        // Perfect code - made out of laziness. Got tired of deleting all the sheets by hand while testing ;)
+function delete3LetterTabs(){             // Perfect code - made out of laziness. Got tired of deleting all the sheets by hand while testing ;)
                 
   ssSheets.forEach(function(obj){
     // if the tab is a 3 letter tab delete it
@@ -167,7 +163,7 @@ function payroll() {
     var nameFirstLast = nameFL ( fullName, displayName );               //function formats name to Greg Fashbaugh 
     var normalizedName = normalizeName ( displayName, fullName );       //format name to gregFashbaugh
     
-    if(fullName){                             // if a fullName exists,
+    if(employee['currentlyEmployed']){                             // if a fullName exists,
       payStub = newTab(fullName.slice(0, 3)); // make a new tab/sheet with first 3 letters of last name as sheet name
     }else{                                    // otherwise break out of this loop
       break;
